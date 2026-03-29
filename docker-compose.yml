@@ -1,0 +1,65 @@
+services:
+
+  # ---------------------------------------------------------------------------
+  # OpenClaw Gateway
+  # ---------------------------------------------------------------------------
+  openclaw-gateway:
+    build: .
+    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      # Persistent state — config, sessions, auth tokens, workspace
+      - openclaw-data:/home/node/.openclaw
+      # Gateway config (read-only mount — edit the template, not the live file)
+      - ./config/gateway.yml.template:/home/node/.openclaw/config.yml:ro
+    ports:
+      # Loopback only — Nginx is the public entry point, not this port
+      - "127.0.0.1:18789:18789"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:18789/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # Nginx Reverse Proxy (self-signed TLS — swap for Certbot when you add a domain)
+  # ---------------------------------------------------------------------------
+  nginx:
+    build: ./nginx
+    container_name: openclaw-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/openclaw.conf:ro
+    depends_on:
+      openclaw-gateway:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Ollama (optional local model inference — uncomment to enable)
+  # ---------------------------------------------------------------------------
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: openclaw-ollama
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ollama-data:/root/.ollama
+  #   ports:
+  #     - "127.0.0.1:11434:11434"
+  #   # If you have an NVIDIA GPU:
+  #   # deploy:
+  #   #   resources:
+  #   #     reservations:
+  #   #       devices:
+  #   #         - driver: nvidia
+  #   #           count: all
+  #   #           capabilities: [gpu]
+
+volumes:
+  openclaw-data:
+  # ollama-data:

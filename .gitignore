@@ -1,0 +1,20 @@
+# API keys and secrets — NEVER commit these
+.env
+*.env.local
+
+# OpenClaw runtime state
+.openclaw/
+
+# Nginx generated certs (built into the nginx container image)
+nginx/certs/
+
+# Logs
+logs/
+*.log
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

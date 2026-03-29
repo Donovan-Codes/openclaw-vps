@@ -1,0 +1,128 @@
+# =============================================================================
+# OpenClaw Gateway Configuration
+# =============================================================================
+# This file is mounted read-only into the container at:
+#   /home/node/.openclaw/config.yml
+#
+# Environment variables from .env are substituted at runtime using ${VAR} syntax.
+#
+# To activate a commented-out block: uncomment it and set the corresponding
+# environment variable(s) in your .env (or via setup.sh).
+#
+# Docs: https://docs.openclaw.ai/gateway/configuration.md
+# =============================================================================
+
+gateway:
+  # Bind to loopback only — Nginx is the public entry point
+  bind: loopback
+  mode: local
+  auth:
+    token: ${OPENCLAW_GATEWAY_TOKEN}
+
+# =============================================================================
+# MODEL PROVIDERS
+# =============================================================================
+# OpenClaw reads API keys from environment variables. Any provider whose key
+# is set in .env is automatically available in the dashboard model selector.
+#
+# You don't need to list providers here unless you want to set custom options
+# (e.g. a specific model as default, custom base URL, headers).
+# =============================================================================
+
+models:
+  providers:
+    anthropic:
+      apiKey: ${ANTHROPIC_API_KEY}
+
+    groq:
+      apiKey: ${GROQ_API_KEY}
+
+    google:
+      apiKey: ${GOOGLE_API_KEY}
+
+    openai:
+      apiKey: ${OPENAI_API_KEY}
+
+    openrouter:
+      apiKey: ${OPENROUTER_API_KEY}
+
+    mistral:
+      apiKey: ${MISTRAL_API_KEY}
+
+    cohere:
+      apiKey: ${COHERE_API_KEY}
+
+    together:
+      apiKey: ${TOGETHER_API_KEY}
+
+    # Ollama (local models — no API key, just a base URL)
+    # Uncomment and set OLLAMA_BASE_URL in .env to enable.
+    # ollama:
+    #   baseUrl: ${OLLAMA_BASE_URL}
+
+# =============================================================================
+# CHANNELS
+# =============================================================================
+
+channels:
+
+  # ---------------------------------------------------------------------------
+  # Telegram (ENABLED by default)
+  # ---------------------------------------------------------------------------
+  # To disable: set `enabled: false` or remove the TELEGRAM_BOT_TOKEN from .env
+  # dmPolicy options: "pairing" (safest) | "open" | "none"
+  # ---------------------------------------------------------------------------
+  telegram:
+    enabled: true
+    botToken: ${TELEGRAM_BOT_TOKEN}
+    dmPolicy: pairing
+
+  # ---------------------------------------------------------------------------
+  # Discord (DISABLED — uncomment to enable)
+  # ---------------------------------------------------------------------------
+  # Prerequisites:
+  #   1. Create a bot at https://discord.com/developers/applications
+  #   2. Set DISCORD_BOT_TOKEN in .env
+  # ---------------------------------------------------------------------------
+  # discord:
+  #   enabled: true
+  #   token: ${DISCORD_BOT_TOKEN}
+
+  # ---------------------------------------------------------------------------
+  # Slack (DISABLED — uncomment to enable)
+  # ---------------------------------------------------------------------------
+  # Prerequisites:
+  #   1. Create a Slack app with Socket Mode at https://api.slack.com/apps
+  #   2. Subscribe to events: app_mention, message.channels, message.groups,
+  #      message.im, message.mpim, reaction_added, reaction_removed,
+  #      member_joined_channel, member_left_channel, channel_rename,
+  #      pin_added, pin_removed
+  #   3. Set SLACK_APP_TOKEN and SLACK_BOT_TOKEN in .env
+  # ---------------------------------------------------------------------------
+  # slack:
+  #   enabled: true
+  #   mode: socket
+  #   appToken: ${SLACK_APP_TOKEN}
+  #   botToken: ${SLACK_BOT_TOKEN}
+
+  # ---------------------------------------------------------------------------
+  # WhatsApp (DISABLED — uses QR code login, no token in .env)
+  # ---------------------------------------------------------------------------
+  # After enabling here and starting the gateway, authenticate with:
+  #   docker compose run --rm openclaw-cli channels login --channel whatsapp
+  # Credentials are stored in the openclaw-data volume and persist restarts.
+  # ---------------------------------------------------------------------------
+  # whatsapp:
+  #   enabled: true
+
+# =============================================================================
+# AGENTS
+# =============================================================================
+
+agents:
+  defaults:
+    # Sandbox isolates tool execution (code runner, browser, etc.)
+    # Set OPENCLAW_SANDBOX=1 in .env and run scripts/sandbox-setup.sh to enable.
+    sandbox:
+      mode: non-main
+      scope: agent
