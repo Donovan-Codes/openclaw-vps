@@ -85,7 +85,7 @@ If DNS is not yet live, you can access via IP directly — your browser will sho
 
 Enter your gateway token when prompted. To retrieve it later:
 ```bash
-docker compose run --rm openclaw-cli dashboard --no-open
+docker compose run --rm --entrypoint node openclaw-gateway dist/index.js dashboard --no-open
 ```
 
 Health check:
@@ -191,7 +191,7 @@ Telegram is **enabled by default**. All others are opt-in — uncomment the rele
 ### WhatsApp
 No token needed — uses QR code login:
 ```bash
-docker compose run --rm openclaw-cli channels login --channel whatsapp
+docker compose run --rm --entrypoint node openclaw-gateway dist/index.js channels login --channel whatsapp
 ```
 Sessions are stored in the `openclaw-data` Docker volume and survive container restarts.
 
@@ -240,3 +240,9 @@ ufw status               # is port 443 open?
 docker compose run --rm --no-deps --entrypoint node openclaw-gateway \
   dist/index.js onboard --mode local --no-install-daemon
 ```
+
+**Permission denied on `/home/node/.openclaw`** — the volume was created with root ownership. Fix with:
+```bash
+docker compose run --rm --user root openclaw-gateway chown -R node:node /home/node/.openclaw
+```
+Then re-run onboarding.

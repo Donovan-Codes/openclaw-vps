@@ -217,6 +217,20 @@ prompt_plain "  OLLAMA_BASE_URL:" "$current"
 [[ -z "$REPLY" && -z "$current" ]] && warn "Ollama skipped."
 
 # =============================================================================
+# SECTION 2b: Search Providers
+# =============================================================================
+header "2b/4  Search Providers"
+echo "  Used by the web search skill. Free tier available."
+echo ""
+
+info "Brave Search (free tier: 2,000 queries/month) — https://brave.com/search/api/"
+current=$(get_current "BRAVE_SEARCH_API_KEY")
+prompt_secret "  BRAVE_SEARCH_API_KEY:" "$current"
+[[ -n "$REPLY" ]] && set_env "BRAVE_SEARCH_API_KEY" "$REPLY" && success "Brave Search key set."
+[[ -z "$REPLY" && -n "$current" ]] && success "Brave Search key unchanged."
+[[ -z "$REPLY" && -z "$current" ]] && warn "Brave Search key skipped."
+
+# =============================================================================
 # SECTION 3: Messaging Channels
 # =============================================================================
 header "3/4  Messaging Channels"
@@ -294,6 +308,10 @@ print_status() {
 
 echo "  Gateway:"
 print_status "OPENCLAW_GATEWAY_TOKEN" "Gateway token"
+
+echo ""
+echo "  Search:"
+print_status "BRAVE_SEARCH_API_KEY" "Brave Search"
 
 echo ""
 echo "  LLM Providers:"
