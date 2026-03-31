@@ -71,7 +71,11 @@ docker compose build
 docker compose run --rm --no-deps --entrypoint node openclaw-gateway \
   dist/index.js onboard --mode local --no-install-daemon
 
-# 5. Start everything
+# 5. Set gateway bind so Nginx can reach it over the Docker network
+docker compose run --rm --entrypoint node openclaw-gateway \
+  dist/index.js config set gateway.bind lan
+
+# 6. Start everything
 docker compose up -d
 ```
 
