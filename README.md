@@ -75,7 +75,11 @@ docker compose run --rm --no-deps --entrypoint node openclaw-gateway \
 docker compose run --rm --entrypoint node openclaw-gateway \
   dist/index.js config set gateway.bind lan
 
-# 6. Start everything
+# 6. Allow your VPS IP as a trusted origin for the Control UI
+docker compose run --rm --entrypoint node openclaw-gateway \
+  dist/index.js config set gateway.controlUi.allowedOrigins '["https://<YOUR_VPS_IP>"]'
+
+# 7. Start everything
 docker compose up -d
 ```
 
