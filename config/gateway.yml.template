@@ -13,8 +13,9 @@
 # =============================================================================
 
 gateway:
-  # Bind to loopback only — Nginx is the public entry point
-  bind: loopback
+  # Bind to all container interfaces so Nginx can reach it via Docker network.
+  # External exposure is still controlled by docker-compose (127.0.0.1:18789 on host).
+  bind: lan
   mode: local
   auth:
     token: ${OPENCLAW_GATEWAY_TOKEN}
