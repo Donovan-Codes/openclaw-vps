@@ -25,17 +25,21 @@ services:
       start_period: 60s
 
   # ---------------------------------------------------------------------------
-  # Nginx Reverse Proxy (self-signed TLS — swap for Certbot when you add a domain)
+  # Nginx Reverse Proxy
+  # Set DOMAIN in .env to your domain for Let's Encrypt, or leave empty for self-signed.
   # ---------------------------------------------------------------------------
   nginx:
     build: ./nginx
     container_name: openclaw-nginx
     restart: unless-stopped
+    env_file: .env
+    environment:
+      - DOMAIN=${DOMAIN:-}
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/openclaw.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       openclaw-gateway:
         condition: service_healthy

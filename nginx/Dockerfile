@@ -1,12 +1,13 @@
 # =============================================================================
-# Nginx — Reverse Proxy with Self-Signed TLS
+# Nginx — Reverse Proxy
 # =============================================================================
-# Generates a 10-year self-signed certificate at BUILD TIME.
-# Your browser will show an "untrusted" warning — that's expected for self-signed.
-# Click through it (or add a permanent exception).
+# Supports two modes controlled by the DOMAIN env var in .env:
 #
-# When you add a domain, replace this with Certbot + Let's Encrypt:
-#   https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+#   DOMAIN=         (empty) → generates a self-signed cert at build time
+#   DOMAIN=your.domain.com → uses Let's Encrypt cert from /etc/letsencrypt
+#
+# The nginx.conf.template uses ${DOMAIN} placeholders which are substituted
+# at container startup by the official nginx envsubst entrypoint.
 # =============================================================================
 
 FROM nginx:alpine
@@ -17,5 +18,8 @@ RUN apk add --no-cache openssl && \
       -keyout /etc/nginx/certs/self.key \
       -out    /etc/nginx/certs/self.crt \
       -subj   "/CN=openclaw-vps/O=OpenClaw/C=US"
+
+# Copy template — nginx entrypoint will run envsubst on startup
+COPY nginx.conf.template /etc/nginx/templates/openclaw.conf.template
 
 EXPOSE 80 443

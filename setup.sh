@@ -121,7 +121,17 @@ chmod 600 "$ENV_FILE"
 # =============================================================================
 # SECTION 1: Gateway Token
 # =============================================================================
-header "1/4  Gateway Token"
+header "1/4  Domain"
+echo "  Your subdomain for the dashboard (e.g. openclaw.yourdomain.com)."
+echo "  Leave empty to use self-signed cert (IP access only)."
+echo ""
+current=$(get_current "DOMAIN")
+prompt_plain "  DOMAIN:" "$current"
+[[ -n "$REPLY" ]] && set_env "DOMAIN" "$REPLY" && success "Domain set."
+[[ -z "$REPLY" && -n "$current" ]] && success "Domain unchanged."
+[[ -z "$REPLY" && -z "$current" ]] && warn "No domain set — self-signed cert will be used."
+
+header "2/4  Gateway Token"
 echo "  This token protects your OpenClaw dashboard."
 echo "  Set a strong passphrase. If left empty, one will be auto-generated on first start."
 echo ""
@@ -138,7 +148,7 @@ fi
 # =============================================================================
 # SECTION 2: LLM Provider API Keys
 # =============================================================================
-header "2/4  LLM Provider API Keys"
+header "3/5  LLM Provider API Keys"
 echo "  Press Enter to skip any provider you don't use."
 echo "  Input is masked — your keys will not be displayed."
 echo ""
@@ -219,7 +229,7 @@ prompt_plain "  OLLAMA_BASE_URL:" "$current"
 # =============================================================================
 # SECTION 2b: Search Providers
 # =============================================================================
-header "2b/4  Search Providers"
+header "3b/5  Search Providers"
 echo "  Used by the web search skill. Free tier available."
 echo ""
 
@@ -233,7 +243,7 @@ prompt_secret "  BRAVE_SEARCH_API_KEY:" "$current"
 # =============================================================================
 # SECTION 3: Messaging Channels
 # =============================================================================
-header "3/4  Messaging Channels"
+header "4/5  Messaging Channels"
 echo "  Telegram is enabled by default. Other channels are opt-in."
 echo ""
 
@@ -291,7 +301,7 @@ fi
 # =============================================================================
 # SECTION 4: Summary
 # =============================================================================
-header "4/4  Summary"
+header "5/5  Summary"
 echo ""
 
 print_status() {
