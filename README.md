@@ -79,7 +79,12 @@ docker compose run --rm --entrypoint node openclaw-gateway \
 docker compose run --rm --entrypoint node openclaw-gateway \
   dist/index.js config set gateway.controlUi.allowedOrigins '["https://<YOUR_VPS_IP>"]'
 
-# 7. Start everything
+# 7. Trust the Nginx container as a proxy so the gateway treats connections as local
+#    (without this you will get "pairing required" errors)
+docker compose run --rm --entrypoint node openclaw-gateway \
+  dist/index.js config set gateway.trustedProxies '["172.18.0.0/16"]'
+
+# 8. Start everything
 docker compose up -d
 ```
 
