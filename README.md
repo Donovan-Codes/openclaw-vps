@@ -92,18 +92,37 @@ docker compose up -d
 
 ## Accessing the dashboard
 
-Open `https://openclaw.yourdomain.com` in your browser.
+Open `https://<YOUR_VPS_IP>` in your browser (your browser will show a self-signed cert warning — click **Advanced → Proceed**).
 
-If DNS is not yet live, you can access via IP directly — your browser will show a self-signed cert warning. Click **Advanced → Proceed** to continue.
-
-Enter your gateway token when prompted. To retrieve it later:
+### Step 1 — Get the token URL
 ```bash
-docker compose run --rm --entrypoint node openclaw-gateway dist/index.js dashboard --no-open
+docker compose exec openclaw-gateway node dist/index.js dashboard --no-open
 ```
+This prints a URL like `http://127.0.0.1:18789/#token=...`. Replace `127.0.0.1:18789` with your VPS IP and open it in your browser.
+
+### Step 2 — Click Connect
+
+The first time you connect, the gateway will show **"pairing required"**. This is a one-time device approval step.
+
+### Step 3 — Approve the browser device
+
+On the VPS, check for the pending request:
+```bash
+docker compose exec openclaw-gateway node dist/index.js devices list
+```
+
+You'll see a pending entry with a request ID. Approve it:
+```bash
+docker compose exec openclaw-gateway node dist/index.js devices approve <requestId>
+```
+
+Then click **Connect** in the browser again — you're in.
+
+**Note**: Device approval is a one-time step per browser. Once approved, future connections go straight through.
 
 Health check:
 ```bash
-curl -fsSk https://openclaw.yourdomain.com/healthz
+curl -fsSk https://<YOUR_VPS_IP>/healthz
 ```
 
 ---
